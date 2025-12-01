@@ -7,6 +7,7 @@ import path from "path";
 import { directoryCreationErrorToast, fileWriteErrorToast } from "../../../components/Toasts";
 import { CODE_BLOCK_REGEX } from "../../../utils/constants";
 import { applyTemplates } from "../../templating/templating.service";
+import { sanitizeTitle } from "../../../utils/utils";
 
 export async function appendSelectedTextTo(note: Note) {
   let { appendSelectedTemplate } = getPreferenceValues<SearchNotePreferences>();
@@ -66,6 +67,7 @@ export async function createNote(vault: Vault, params: CreateNoteParams) {
   content = createObsidianProperties(params.tags) + content;
   content = await applyTemplates(content);
   name = await applyTemplates(name);
+  name = sanitizeTitle(name);
 
   const saved = await saveStringToDisk(vault.path, content, name, params.path);
 

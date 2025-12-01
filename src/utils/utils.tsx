@@ -1,10 +1,66 @@
 import fs from "fs";
 import path from "path";
+import os from "os";
 import { BYTES_PER_KILOBYTE } from "./constants";
 import { Media } from "./interfaces";
 import { Vault } from "../api/vault/vault.types";
 import { Note } from "../api/vault/notes/notes.types";
 import { getSelectedText } from "@raycast/api";
+
+export function expandPath(filepath: string): string {
+  if (filepath.startsWith("~")) {
+    return path.join(os.homedir(), filepath.slice(1));
+  }
+  return path.resolve(filepath);
+}
+
+export function sanitizeTitle(input: string): string {
+  // Get first line
+  let firstLine = input.split('\n')[0] || "";
+  
+  // Get first sentence (split by . ! ?)
+  const sentenceMatch = firstLine.match(/^[^.!?]*[.!?]/);
+  let firstSentence = sentenceMatch ? sentenceMatch[0] : firstLine;
+  
+  // Remove trailing punctuation from the match if it was included
+  firstSentence = firstSentence.replace(/[.!?]$/, '');
+  
+  // Trim
+  firstSentence = firstSentence.trim();
+  
+  if (!firstSentence) {
+    firstSentence = firstLine;
+  }
+
+  // Lowercase
+  let value = firstSentence.toLowerCase();
+  
+  // Remove #
+  value = value.replace(/#/g, '');
+
+  // Replace - with _
+  value = value.replace(/-/g, '_');
+  
+  // Remove non-alphanumeric (except space, _)
+  value = value.replace(/[^a-z0-9 _]/g, '');
+  
+  // Replace spaces with _
+  value = value.replace(/\s+/g, '_');
+  
+  // Replace multiple _ with single _
+  value = value.replace(/_+/g, '_');
+  
+  // Strip leading/trailing _
+  value = value.replace(/^_+|_+$/g, '');
+
+  // Truncate to max 60 chars
+  if (value.length > 60) {
+    value = value.substring(0, 60);
+    value = value.replace(/_+$/, '');
+  }
+  
+  return value || "quicknote";
+}
 
 export function sortByAlphabet(a: string, b: string) {
   const aTitle = a;

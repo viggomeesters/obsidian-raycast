@@ -7,6 +7,7 @@ import { performance } from "perf_hooks";
 import { AUDIO_FILE_EXTENSIONS, LATEX_INLINE_REGEX, LATEX_REGEX, VIDEO_FILE_EXTENSIONS } from "../../utils/constants";
 import { Media } from "../../utils/interfaces";
 import { GlobalPreferences, SearchNotePreferences } from "../../utils/preferences";
+import { expandPath } from "../../utils/utils";
 import { tagsForString } from "../../utils/yaml";
 import { getBookmarkedNotePaths } from "./notes/bookmarks/bookmarks.service";
 import { Note } from "./notes/notes.types";
@@ -34,6 +35,7 @@ export function parseVaults(): Vault[] {
   return vaultString
     .split(",")
     .filter((vaultPath) => vaultPath.trim() !== "")
+    .map((vaultPath) => expandPath(vaultPath.trim()))
     .filter((vaultPath) => fs.existsSync(vaultPath))
     .map((vault) => ({ name: getVaultNameFromPath(vault.trim()), key: vault.trim(), path: vault.trim() }));
 }

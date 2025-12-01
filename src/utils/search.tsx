@@ -15,18 +15,17 @@ export function filterNotes(notes: Note[], input: string, byContent: boolean) {
     return notes;
   }
 
-  input = input.toLowerCase();
+  const searchTerms = input.toLowerCase().split(/\s+/).filter((term) => term.length > 0);
 
-  if (byContent) {
-    return notes.filter(
-      (note) =>
-        note.content.toLowerCase().includes(input) ||
-        note.title.toLowerCase().includes(input) ||
-        note.path.toLowerCase().includes(input)
+  return notes.filter((note) => {
+    const title = note.title.toLowerCase();
+    const path = note.path.toLowerCase();
+    const content = byContent ? note.content.toLowerCase() : "";
+
+    return searchTerms.every(
+      (term) => title.includes(term) || path.includes(term) || (byContent && content.includes(term))
     );
-  } else {
-    return notes.filter((note) => note.title.toLowerCase().includes(input));
-  }
+  });
 }
 
 export function filterNotesFuzzy(notes: Note[], input: string, byContent: boolean) {
@@ -70,16 +69,23 @@ export function filterMedia(mediaList: Media[], input: string, notes: Note[]) {
     return mediaList;
   }
 
-  input = input.toLowerCase();
+  const searchTerms = input.toLowerCase().split(/\s+/).filter((term) => term.length > 0);
 
-  notes = notes.filter((note) => note.title.toLowerCase().includes(input));
+  const filteredNotes = notes.filter((note) => {
+    const title = note.title.toLowerCase();
+    return searchTerms.every((term) => title.includes(term));
+  });
 
   return mediaList.filter((media) => {
+    const title = media.title.toLowerCase();
+    const path = media.path.toLowerCase();
+
+    const mediaMatches = searchTerms.every((term) => title.includes(term) || path.includes(term));
+
     return (
-      media.title.toLowerCase().includes(input) ||
-      media.path.toLowerCase().includes(input) ||
+      mediaMatches ||
       // Filter media that is mentioned in a note which has the searched title
-      notes.some((note) => note.content.includes(media.title))
+      filteredNotes.some((note) => note.content.includes(media.title))
     );
   });
 }
