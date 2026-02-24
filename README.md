@@ -1,3 +1,9 @@
+> **⚠️ Archived** — This project has been superseded by [raycast-life-os](https://github.com/viggomeesters/raycast-life-os), a unified Raycast extension for vault management (Life OS).
+> Specific functionality moved to: **unified Life OS extension** (all commands consolidated).
+
+---
+
+
 <p align="center">
 <img width=180 src="https://user-images.githubusercontent.com/67844154/164725204-544131bd-60e4-4666-8541-6587f20d7e42.png">
 </p>
